@@ -7,12 +7,15 @@ export default {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    fontFamily: {
+      VCHenrietta: ["VCHenrietta", "sans-serif"],
+    },
     extend: {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
     },
-  },
-  plugins: [],
+    plugins: [],
+  }
 } satisfies Config;
