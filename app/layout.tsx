@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { PopoverProvider } from "./context/PopoverContext";
+import { GeoProvider } from "./context/GeoContext";
+import FilterContextProvider from "./context/FilterContext";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -19,10 +22,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${plusJakartaSans.variable} antialiased`}
-      >
-        {children}
+      <body className={`${plusJakartaSans.variable} antialiased`}>
+        <GeoProvider>
+          <FilterContextProvider>
+            <PopoverProvider>{children}</PopoverProvider>
+          </FilterContextProvider>
+        </GeoProvider>
       </body>
     </html>
   );

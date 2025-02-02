@@ -1,38 +1,47 @@
 [
   {
     "id": 2,
-    "name": "Apartment"
+    "name": "Apartment",
+    "icon": "/images/apartment.png"
   },
   {
     "id": 3,
-    "name": "House"
+    "name": "House",
+    "icon": "/images/house.png"
   },
   {
     "id": 1,
-    "name": "Rooms/Co-Living"
+    "name": "Rooms/Co-Living",
+    "icon": "/images/apartment.png"
   },
   {
     "id": 4,
-    "name": "Plots"
+    "name": "Plots",
+    "icon": "/images/house.png"
   },
   {
     "id": 20,
-    "name": "Office"
+    "name": "Office",
+    "icon": "/images/farm.png"
   },
   {
     "id": 5,
-    "name": "Commercial propety"
+    "name": "Commercial propety",
+    "icon": "/images/hotel.png"
   },
   {
     "id": 12,
-    "name": "New construction projects"
+    "name": "New construction projects",
+    "icon": "/images/hotel.png"
   },
   {
     "id": 11,
-    "name": "Holiday Homes"
+    "name": "Holiday Homes",
+    "icon": "/images/yurt.png"
   },
   {
     "id": 13,
-    "name": "Parking"
+    "name": "Parking",
+    "icon": "/images/campervan.png"
   }
 ]

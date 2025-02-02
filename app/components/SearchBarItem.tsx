@@ -1,16 +1,21 @@
+import { twMerge } from "tailwind-merge";
+
 type SearchBarItemProps = {
   title: string;
   icon: React.ReactNode;
-  content?: React.ReactNode;
+  children?: React.ReactNode;
+  className?: string;
 };
 
 const SearchBarItem = (props: SearchBarItemProps) => {
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div
+      className={twMerge("flex flex-row items-center gap-2", props.className)}
+    >
       {props.icon}
       <div className="flex flex-col">
         <p className="text-black font-semibold">{props.title}</p>
-        {props.content}
+        {props.children}
       </div>
     </div>
   );

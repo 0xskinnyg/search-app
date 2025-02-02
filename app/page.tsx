@@ -2,48 +2,33 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import Tabs from "./components/Tabs";
 import SearchBar from "./components/SearchBar";
+import { useFilter } from "./context/FilterContext";
+import Tab from "./components/Tab";
+
+export type TabType = "rent" | "buy" | "discover";
+
+const tabs = [
+  {
+    name: "Rent",
+    value: "rent" as TabType,
+  },
+  {
+    name: "Buy",
+    value: "buy" as TabType,
+  },
+  {
+    name: "Lystio AI",
+    value: "discover" as TabType,
+  },
+] as const;
 
 export default function Home() {
-  const [selected, setSelected] = useState("Rent");
-  const tabsWithContent = [
-    {
-      tab: "Rent",
-      content: (
-        <div className="text-white">
-          <SearchBar content="Rent" />
-        </div>
-      ),
-    },
-    {
-      tab: "Buy",
-      content: (
-        <div className="text-white">
-          <SearchBar content="Buy" />
-        </div>
-      ),
-    },
-    {
-      tab: "Lystio AI",
-      customLeftLogo: (
-        <Image
-          src="/images/mingcute_ai-fill.png"
-          alt="logo"
-          width={22}
-          height={22}
-        />
-      ),
-      content: (
-        <div className="text-white max-w-80">
-          Discover your next home near you or your most desired location with
-          our AI-powered platform.
-        </div>
-      ),
-    },
-  ];
+  const [selectedTab, setSelectedTab] = useState<TabType>("rent");
+  const { searchResults } = useFilter();
+
   return (
-    <div className="font-[family-name:var(--font-plus-jakarta-sans)]">
+    <div className="font-PlusJakartaSans">
       <header>
         <div className="flex flex-row justify-between py-4 px-2 pl-11">
           <Image
@@ -63,28 +48,33 @@ export default function Home() {
             <button className="py-4 px-16 border border-[#4F4040] rounded-full">
               Log In
             </button>
-            <button className="py-4 px-16 border border-[#4F4040] rounded-full bg-[#A540F3] text-white">
+            <button className="py-4 px-16 border border-[#4F4040] rounded-full bg-primary text-white">
               Register
             </button>
           </div>
         </div>
       </header>
-      <main className="min-h-screen">
-        <div className="flex flex-col items-center justify-center bg-[url('/images/hero.jpeg')] bg-cover bg-center pb-80">
+      <main>
+        <div className="flex flex-col items-start bg-[url('/images/hero.jpeg')] min-h-screen bg-cover bg-opacity-100 bg-center pt-20 pb-40 lg:px-80">
           <h1 className="font-VCHenrietta font-medium text-[90px] mb-20 text-white">
             Rent faster, Buy smarter
           </h1>
-          <div className="flex flex-col">
-            <Tabs
-              tabs={tabsWithContent}
-              selectedTab={tabsWithContent.findIndex((t) => t.tab === selected)}
-              setSelectedTab={(index) =>
-                setSelected(tabsWithContent[index].tab)
-              }
-            />
-            <div className="mt-6">
-              {tabsWithContent.find((t) => t.tab === selected)?.content}
+          <div className="flex flex-col gap-8">
+            <div className="flex flex-row bg-white border border-primary border-1 border-solid rounded-full max-w-fit">
+              {tabs.map((tab) => (
+                <Tab
+                  key={tab.value}
+                  tab={tab}
+                  selectedTab={selectedTab}
+                  setSelectedTab={setSelectedTab}
+                />
+              ))}
             </div>
+            <SearchBar content={selectedTab} />
+            <p className="text-center text-2xl text-white">
+              {searchResults.count} verified listings for apartments, houses,
+              office and more
+            </p>
           </div>
         </div>
       </main>
