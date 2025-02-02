@@ -6,18 +6,35 @@ import categories from "../categories.json";
 
 import { Slider } from "@mui/material";
 import Popover from "./Popover";
-import { usePopover } from "../context/PopoverContext";
+import { PopoverType, usePopover } from "../context/PopoverContext";
 import LocationPopoverContent from "./LocationPopoverContent";
 import { useFilter } from "../context/FilterContext";
 import { twMerge } from "tailwind-merge";
+import { styled } from "@mui/material/styles";
 
-type SearchBarProps = {
-  content: string;
-};
+const CustomSlider = styled(Slider)({
+  color: "#A540F3",
+  "& .MuiSlider-thumb": {
+    "&:hover, &.Mui-focusVisible": {
+      boxShadow: `0px 0px 0px 8px rgba(165, 64, 243, 0.16)`,
+    },
+    "&.Mui-active": {
+      boxShadow: `0px 0px 0px 14px rgba(165, 64, 243, 0.16)`,
+    },
+  },
+  "& .MuiSlider-rail": {
+    opacity: 0.32,
+  },
+  "& .MuiSlider-track": {
+    border: "none",
+  },
+  "& .MuiSlider-valueLabel": {
+    backgroundColor: "#A540F3",
+  },
+});
 
-const SearchBar = (props: SearchBarProps) => {
+const SearchBar = () => {
   const [priceRange, setPriceRange] = useState([0, 1000000]);
-  const [selectedLocation, setSelectedLocation] = useState("");
 
   const { activePopover, setActivePopover } = usePopover();
   const { withinId, type, setType, rentType, rent, setRent, setSearchResults } =
@@ -62,29 +79,35 @@ const SearchBar = (props: SearchBarProps) => {
       console.error("Error fetching search results:", error);
     }
   };
-
+  console.log(activePopover);
   return (
-    <div className="bg-white rounded-full border border-primary border-1 border-solid px-20 py-5">
-      <form className="grid grid-cols-5 gap-40" onSubmit={handleSubmit}>
+    <div className="bg-white md:rounded-full border md:border-primary border-1 border-solid px-4 sm:px-8 py-3 sm:py-4 md:py-5 w-full max-w-[1624px]">
+      <form
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-8 xl:gap-40"
+        onSubmit={handleSubmit}
+      >
         <SearchBarItem
-          className="col-span-2"
+          className="col-span-1 sm:col-span-2"
           title={"Location"}
           icon={
             <Image
               src="/images/search-icon.png"
-              alt="Location"
+              alt="location"
               width={22}
               height={22}
             />
           }
         >
-          <div className="relative">
+          <div className="relative max-w-full sm:max-w-96">
             <p
-              className="text-secondary cursor-pointer text-nowrap whitespace-nowrap"
-              onClick={() => setActivePopover("location")}
+              className="text-secondary cursor-pointer truncate max-w-40 md:max-w-96 text-sm sm:text-base popover-trigger"
+              onClick={() => {
+                setActivePopover((prevState: PopoverType) =>
+                  prevState !== "location" ? ("location" as PopoverType) : null
+                );
+              }}
             >
-              {selectedLocation ||
-                "Search address, neighbourhood, city, or ZIP code"}
+              Search address, neighbourhood, city, or ZIP code
             </p>
             {activePopover === "location" && (
               <Popover>
@@ -93,21 +116,27 @@ const SearchBar = (props: SearchBarProps) => {
             )}
           </div>
         </SearchBarItem>
+
         <SearchBarItem
+          className="col-span-1"
           title="Category"
           icon={
             <Image
               src="/images/category-icon.png"
-              alt="Category"
+              alt="category"
               width={22}
               height={22}
             />
           }
         >
-          <div className="relative lg:min-w-96">
+          <div className="relative max-w-full sm:max-w-[200px]">
             <p
-              className="text-secondary cursor-pointer max-w-48 text-nowrap text-ellipsis overflow-hidden"
-              onClick={() => setActivePopover("category")}
+              className="text-secondary cursor-pointer truncate min-w-40 max-w-40 md:max-w-96 text-sm sm:text-base popover-trigger"
+              onClick={() =>
+                setActivePopover((prevState: PopoverType) =>
+                  prevState !== "category" ? ("category" as PopoverType) : null
+                )
+              }
             >
               {selectedCategories.length === 0
                 ? "Select Category"
@@ -117,7 +146,7 @@ const SearchBar = (props: SearchBarProps) => {
             </p>
             {activePopover === "category" && (
               <Popover>
-                <div className="flex flex-col gap-2 max-h-80 overflow-y-scroll">
+                <div className="flex flex-col gap-2  min-w-48 xs:min-w-60 max-h-80 overflow-y-scroll">
                   {categories.map((category) => (
                     <div
                       key={category.id}
@@ -147,21 +176,27 @@ const SearchBar = (props: SearchBarProps) => {
             )}
           </div>
         </SearchBarItem>
+
         <SearchBarItem
+          className="col-span-1"
           title="Price"
           icon={
             <Image
               src="/images/price-icon.png"
-              alt="Location"
+              alt="price"
               width={22}
               height={22}
             />
           }
         >
-          <div className="relative">
+          <div className="relative max-w-full sm:max-w-[200px]">
             <p
-              className="text-secondary cursor-pointer text-nowrap whitespace-nowrap"
-              onClick={() => setActivePopover("price")}
+              className="text-secondary cursor-pointer truncate max-w-full text-sm sm:text-base popover-trigger"
+              onClick={() =>
+                setActivePopover((prevState: PopoverType) =>
+                  prevState !== "price" ? ("price" as PopoverType) : null
+                )
+              }
             >
               {priceRange[0] === 0 && priceRange[1] === 1000000
                 ? "Select Price"
@@ -169,13 +204,22 @@ const SearchBar = (props: SearchBarProps) => {
             </p>
             {activePopover === "price" && (
               <Popover>
-                <div className="p-4 w-64">
-                  <Slider
+                <div className="flex flex-col items-start gap-4 p-4 w-full min-w-48 xs:min-w-60">
+                  <p className="font-semibold">Price Range</p>
+                  <div className="flex gap-2 items-baseline">
+                    {new Array(20).fill(0).map((_, index) => (
+                      <div
+                        key={index}
+                        className="bg-primary w-1"
+                        style={{ height: `${index * 2 + 5}px` }}
+                      />
+                    ))}
+                  </div>
+                  <CustomSlider
                     aria-label="Price Range"
-                    name="price"
                     value={priceRange}
-                    valueLabelDisplay="auto"
                     onChange={handlePriceRangeChange}
+                    valueLabelDisplay="auto"
                     min={0}
                     max={1000000}
                   />
@@ -184,7 +228,8 @@ const SearchBar = (props: SearchBarProps) => {
             )}
           </div>
         </SearchBarItem>
-        <button className="rounded-full py-2 bg-primary text-white">
+
+        <button className="col-span-1 rounded-full py-3 sm:py-4 px-6 sm:px-8 bg-primary text-white font-semibold text-sm sm:text-base">
           Search
         </button>
       </form>

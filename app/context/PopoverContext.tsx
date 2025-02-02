@@ -1,11 +1,17 @@
 "use client";
-import { createContext, useContext, useState } from "react";
+import {
+  createContext,
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 
-type PopoverType = "location" | "category" | "price" | null;
+export type PopoverType = "location" | "category" | "price" | null;
 
 const PopoverContext = createContext<{
   activePopover: PopoverType;
-  setActivePopover: (type: PopoverType) => void;
+  setActivePopover: Dispatch<SetStateAction<PopoverType>>;
 }>({
   activePopover: null,
   setActivePopover: () => {},
