@@ -173,7 +173,7 @@ const SearchBar = () => {
           </div>
         </SearchBarItem>
 
-        <button className="col-span-1 rounded-full py-3 sm:py-4 px-6 sm:px-8 bg-primary text-white font-semibold text-sm sm:text-base">
+        <button className="col-span-1 rounded-full py-3 sm:py-4 px-6 sm:px-8 bg-primary text-white font-semibold text-sm sm:text-base hover:bg-primary/90">
           Search
         </button>
       </form>
