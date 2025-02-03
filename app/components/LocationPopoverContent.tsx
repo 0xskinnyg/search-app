@@ -14,10 +14,8 @@ const DynamicAddressAutofill = dynamic(
 const LocationPopoverContent = () => {
   const [selectedCity, setSelectedCity] = useState("Vienna");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [menuItems, setMenuItems] = useState<
-    { name: string; id: string; postal_code: string }[]
-  >([]);
-  const { withinId, setWithinId, popularLocations } = useFilter();
+  const { withinId, setWithinId, popularLocations, menuItems, setMenuItems } =
+    useFilter();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -183,7 +181,7 @@ const LocationPopoverContent = () => {
             ))}
           </div>
         </div>
-        <div>
+        <div className="hidden lg:block">
           <p className="text-secondary text-sm mb-2">Recent Searches</p>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-4 cursor-pointer p-2">

@@ -64,12 +64,12 @@ const PricePopoverContent = (props: PricePopoverContentProps) => {
         {histogramBars.map((bar, index) => (
           <div
             key={index}
-            className={`group relative w-1 lg:w-2 border border-primary border-b border-1 border-solid ${
+            className={`group/histogram relative w-1 lg:w-2 border border-primary border-b border-1 border-solid ${
               bar.height > 0 ? 'bg-primary' : ''
             }`}
             style={{ height: `${bar.height || 1}px` }}
           >
-            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-10">
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover/histogram:opacity-100 whitespace-nowrap pointer-events-none transition-opacity z-10">
               <div className="flex flex-col items-center">
                 <span>{bar.count} properties</span>
                 <span>€{bar.priceRange.min.toLocaleString()} - €{bar.priceRange.max.toLocaleString()}</span>

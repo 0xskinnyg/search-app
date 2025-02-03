@@ -5,7 +5,7 @@ import Image from "next/image";
 import categories from "../categories.json";
 
 import Popover from "./Popover";
-import { PopoverType, usePopover } from "../context/PopoverContext";
+import { usePopover } from "../context/PopoverContext";
 import LocationPopoverContent from "./LocationPopoverContent";
 import { useFilter } from "../context/FilterContext";
 
@@ -22,7 +22,7 @@ const SearchBar = () => {
     rent,
     setRent,
     setSearchResults,
-    menuItems,
+    popularLocations,
   } = useFilter();
 
   const selectedCategories = useMemo(() => {
@@ -57,23 +57,16 @@ const SearchBar = () => {
     }
   };
 
-  // Get selected districts names
   const selectedDistrictsText = useMemo(() => {
-    if (!withinId.length) return "";
+    if (!withinId?.length) return "";
+    return popularLocations
+      ?.flatMap((item) => item.children)
+      ?.filter((item) => withinId.includes(item.id))
+      ?.map((item) => item.name)
+      ?.join(", ");
+  }, [withinId, popularLocations]);
 
-    const selectedDistricts = menuItems
-      .filter((item) => withinId.includes(item.id))
-      .map((item) => item.name);
-
-    return selectedDistricts.join(", ");
-  }, [withinId, menuItems]);
-
-  // Update input placeholder/value based on selection
-  const inputText = useMemo(() => {
-    if (selectedDistrictsText) {
-      return selectedDistrictsText;
-    }
-  }, [selectedDistrictsText]);
+  const inputText = selectedDistrictsText;
 
   return (
     <div className="bg-white md:rounded-full border md:border-primary border-1 border-solid px-4 sm:px-8 py-3 sm:py-4 md:py-5 w-full max-w-[1624px]">
@@ -82,7 +75,7 @@ const SearchBar = () => {
         onSubmit={handleSubmit}
       >
         <SearchBarItem
-          className="col-span-1 sm:col-span-2"
+          className="col-span-1 sm:col-span-2 flex cursor-pointer popover-trigger"
           title={"Location"}
           icon={
             <Image
@@ -92,16 +85,14 @@ const SearchBar = () => {
               height={22}
             />
           }
+          onClick={() => {
+            if (activePopover !== "location") {
+              setActivePopover("location");
+            }
+          }}
         >
           <div className="relative max-w-full sm:max-w-96">
-            <p
-              className="text-secondary cursor-pointer truncate max-w-40 md:max-w-60 lg:max-w-96 text-sm sm:text-base popover-trigger"
-              onClick={() => {
-                setActivePopover((prevState: PopoverType) =>
-                  prevState !== "location" ? ("location" as PopoverType) : null
-                );
-              }}
-            >
+            <p className="text-secondary truncate max-w-40 md:max-w-60 lg:max-w-96 text-sm sm:text-base popover-trigger">
               {inputText
                 ? inputText
                 : "Search address, neighbourhood, city, or ZIP code"}
@@ -115,7 +106,7 @@ const SearchBar = () => {
         </SearchBarItem>
 
         <SearchBarItem
-          className="col-span-1"
+          className="col-span-1 cursor-pointer popover-trigger"
           title="Category"
           icon={
             <Image
@@ -125,16 +116,14 @@ const SearchBar = () => {
               height={22}
             />
           }
+          onClick={() => {
+            if (activePopover !== "category") {
+              setActivePopover("category");
+            }
+          }}
         >
           <div className="relative max-w-full sm:max-w-[200px]">
-            <p
-              className="text-secondary cursor-pointer truncate min-w-40 max-w-40 md:max-w-96 text-sm sm:text-base popover-trigger"
-              onClick={() =>
-                setActivePopover((prevState: PopoverType) =>
-                  prevState !== "category" ? ("category" as PopoverType) : null
-                )
-              }
-            >
+            <p className="text-secondary truncate min-w-40 max-w-40 md:max-w-96 text-sm sm:text-base ">
               {selectedCategories.length === 0
                 ? "Select Category"
                 : selectedCategories
@@ -154,7 +143,7 @@ const SearchBar = () => {
         </SearchBarItem>
 
         <SearchBarItem
-          className="col-span-1"
+          className="col-span-1 cursor-pointer"
           title="Price"
           icon={
             <Image
@@ -164,16 +153,14 @@ const SearchBar = () => {
               height={22}
             />
           }
+          onClick={() => {
+            if (activePopover !== "price") {
+              setActivePopover("price");
+            }
+          }}
         >
           <div className="relative max-w-full sm:max-w-[200px]">
-            <p
-              className="text-secondary cursor-pointer truncate max-w-full text-sm sm:text-base popover-trigger"
-              onClick={() =>
-                setActivePopover((prevState: PopoverType) =>
-                  prevState !== "price" ? ("price" as PopoverType) : null
-                )
-              }
-            >
+            <p className="text-secondary cursor-pointer truncate max-w-full text-sm sm:text-base">
               {rent[0] === 100 && rent[1] === 10000
                 ? "Select Price"
                 : `€${rent[0]} - €${rent[1]}`}

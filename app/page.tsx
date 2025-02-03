@@ -34,7 +34,7 @@ export default function Home() {
         <div className="relative flex flex-col items-center bg-[url('/images/hero.jpeg')] min-h-screen bg-cover bg-opacity-100 bg-center">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('/images/hero-opacity.png')] z-0" />
           <div className="flex flex-col items-center lg:items-start gap-6 z-10">
-            <h1 className="font-VCHenrietta font-medium text-[60px] lg:text-[90px] text-white px-4 xl:px-8 py-20 lg:py-5 2xl:py-20">
+            <h1 className="font-VCHenrietta font-medium text-[60px] lg:text-[90px] text-white px-4 xl:px-8 py-10 lg:py-5 2xl:py-20">
               Rent faster, Buy smarter
             </h1>
             <div className="flex flex-row bg-white border border-primary border-1 border-solid rounded-full max-w-fit lg:mx-8">
@@ -48,7 +48,7 @@ export default function Home() {
               ))}
             </div>
             <SearchBar />
-            <p className="font-abel text-center text-2xl text-white self-center mt-20">
+            <p className="font-abel text-center text-2xl text-white self-center mt-4 lg:mt-20">
               {searchResults.count}{" "}
               <span className="font-abeeZee italic">
                 verified listings <br /> for apartments, houses, office and more

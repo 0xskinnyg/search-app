@@ -5,6 +5,7 @@ type SearchBarItemProps = {
   icon: React.ReactNode;
   children?: React.ReactNode;
   className?: string;
+  onClick?: () => void;
 };
 
 const SearchBarItem = (props: SearchBarItemProps) => {
@@ -14,6 +15,7 @@ const SearchBarItem = (props: SearchBarItemProps) => {
         "flex flex-row items-center gap-4 lg:gap-7 lg:[&:not(:first-child)]:border-l lg:[&:not(:first-child)]:border-[#C6C6C6] lg:[&:not(:first-child)]:pl-4",
         props.className
       )}
+      onClick={props.onClick}
     >
       {props.icon}
       <div className="flex flex-col">

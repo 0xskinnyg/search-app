@@ -24,7 +24,7 @@ export default function Header() {
         transition={{
           type: "spring",
           stiffness: 380,
-          damping: 30
+          damping: 30,
         }}
       />
     </div>
@@ -48,10 +48,10 @@ export default function Header() {
           ))}
         </div>
         <div className="hidden lg:flex items-center gap-4">
-          <button className="py-4 px-16 border border-[#4F4040] rounded-full">
+          <button className="py-4 px-16 border border-[#4F4040] rounded-full hover:bg-black hover:text-white">
             Log In
           </button>
-          <button className="py-4 px-16 rounded-full bg-primary text-white">
+          <button className="py-4 px-16 rounded-full bg-primary text-white hover:bg-primary/90">
             Register
           </button>
         </div>

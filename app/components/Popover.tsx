@@ -2,13 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { usePopover } from "../context/PopoverContext";
 
-const Popover = ({
-  children,
-  excludeClass,
-}: {
-  children: React.ReactNode;
-  excludeClass?: string;
-}) => {
+const Popover = ({ children }: { children: React.ReactNode }) => {
   const { setActivePopover } = usePopover();
   const popoverRef = useRef<HTMLDivElement>(null);
   const [isClosing, setIsClosing] = useState(false);
@@ -16,15 +10,8 @@ const Popover = ({
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      const parentElement = target.parentElement;
 
-      if (
-        popoverRef.current &&
-        !popoverRef.current.contains(target) &&
-        !target.className.includes("--MapboxSearch") &&
-        !parentElement?.className.includes("--SuggestionText") &&
-        !target.className?.includes("popover-trigger")
-      ) {
+      if (!popoverRef.current?.contains(target)) {
         setIsClosing(true);
         setTimeout(() => {
           setActivePopover(null);
@@ -32,9 +19,10 @@ const Popover = ({
         }, 200);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [setActivePopover, excludeClass]);
+  }, [setActivePopover]);
 
   return (
     <div
