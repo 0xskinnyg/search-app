@@ -1,20 +1,16 @@
 "use client";
 import { AddressAutofill } from "@mapbox/search-js-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useFilter } from "../context/FilterContext";
 import { twMerge } from "tailwind-merge";
-import { v4 as uuidv4 } from "uuid";
-import debounce from "lodash/debounce";
 
 const LocationPopoverContent = () => {
   const [selectedCity, setSelectedCity] = useState("Vienna");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+  // const [suggestions, setSuggestions] = useState([]);
   const { withinId, setWithinId, popularLocations, menuItems, setMenuItems } =
     useFilter();
-
-  const sessionToken = uuidv4();
 
   useEffect(() => {
     if (popularLocations !== undefined && popularLocations.length) {
@@ -25,51 +21,52 @@ const LocationPopoverContent = () => {
     }
   }, [popularLocations, selectedCity, setMenuItems]);
 
-  const debouncedFetchSuggestions = useRef(
-    debounce(async (query: string) => {
-      if (query.length < 3) {
-        setSuggestions([]);
-        return;
-      }
+  // TODO when API gets available
+  // const debouncedFetchSuggestions = useRef(
+  //   debounce(async (query: string) => {
+  //     if (query.length < 3) {
+  //       setSuggestions([]);
+  //       return;
+  //     }
 
-      try {
-        const response = await fetch(
-          `/api/mapbox/search/suggest?q=${encodeURIComponent(query)}` // Not working ATM (403 Forbidden)
-        );
+  //     try {
+  //       const response = await fetch(
+  //         `/api/mapbox/search/suggest?q=${encodeURIComponent(query)}` // Not working ATM (403 Forbidden)
+  //       );
 
-        if (!response.ok) {
-          console.log(response);
-          throw new Error("Network response was not ok");
-        }
-        const data = await response.json();
-        setSuggestions(data.suggestions || []);
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
-      }
-    }, 300)
-  ).current;
+  //       if (!response.ok) {
+  //         console.log(response);
+  //         throw new Error("Network response was not ok");
+  //       }
+  //       const data = await response.json();
+  //       setSuggestions(data.suggestions || []);
+  //     } catch (error) {
+  //       console.error("Error fetching suggestions:", error);
+  //     }
+  //   }, 300)
+  // ).current;
 
-  const handleLocationSelect = async (suggestionId: string) => {
-    try {
-      const response = await fetch("/api/mapbox/search/retrieve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          suggestion_id: suggestionId,
-          session_token: sessionToken,
-        }),
-      });
+  // const handleLocationSelect = async (suggestionId: string) => {
+  //   try {
+  //     const response = await fetch("/api/mapbox/search/retrieve", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         suggestion_id: suggestionId,
+  //         session_token: sessionToken,
+  //       }),
+  //     });
 
-      if (!response.ok) throw new Error("Network response was not ok");
-      const data = await response.json();
-      setSelectedLocation(data.feature.properties.name);
-      setSuggestions([]); // Clear suggestions after selection
-    } catch (error) {
-      console.error("Error retrieving location:", error);
-    }
-  };
+  //     if (!response.ok) throw new Error("Network response was not ok");
+  //     const data = await response.json();
+  //     setSelectedLocation(data.feature.properties.name);
+  //     setSuggestions([]); // Clear suggestions after selection
+  //   } catch (error) {
+  //     console.error("Error retrieving location:", error);
+  //   }
+  // };
 
   console.log(menuItems);
   return (
@@ -87,7 +84,7 @@ const LocationPopoverContent = () => {
               value={selectedLocation}
               onChange={(e) => {
                 setSelectedLocation(e.target.value);
-                debouncedFetchSuggestions(e.target.value);
+                // debouncedFetchSuggestions(e.target.value);
               }}
             />
           </AddressAutofill>
