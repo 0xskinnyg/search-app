@@ -1,16 +1,28 @@
 "use client";
-import { AddressAutofill } from "@mapbox/search-js-react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useFilter } from "../context/FilterContext";
 import { twMerge } from "tailwind-merge";
+import dynamic from "next/dynamic";
+
+// Dynamically import AddressAutofill with no SSR
+const DynamicAddressAutofill = dynamic(
+  () => import("@mapbox/search-js-react").then((mod) => mod.AddressAutofill),
+  { ssr: false }
+);
 
 const LocationPopoverContent = () => {
   const [selectedCity, setSelectedCity] = useState("Vienna");
   const [selectedLocation, setSelectedLocation] = useState("");
-  // const [suggestions, setSuggestions] = useState([]);
-  const { withinId, setWithinId, popularLocations, menuItems, setMenuItems } =
-    useFilter();
+  const [menuItems, setMenuItems] = useState<
+    { name: string; id: string; postal_code: string }[]
+  >([]);
+  const { withinId, setWithinId, popularLocations } = useFilter();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     if (popularLocations !== undefined && popularLocations.length) {
@@ -73,21 +85,32 @@ const LocationPopoverContent = () => {
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:w-[600px]">
       <div className="flex flex-col gap-6 flex-1">
         <div className="relative max-h-4">
-          <AddressAutofill
-            accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ""}
-          >
+          {isMounted ? (
+            <DynamicAddressAutofill
+              accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ""}
+            >
+              <input
+                name="address-1 lg:w-full"
+                autoComplete="address-line1"
+                className="text-secondary outline-none truncate font-PlusJakartaSans font-normal opacity-100 border-b border-gray-200 pb-2"
+                placeholder="Insert address, neighbourhood, city, or ZIP code"
+                value={selectedLocation}
+                onChange={(e) => {
+                  setSelectedLocation(e.target.value);
+                  // debouncedFetchSuggestions(e.target.value);
+                }}
+              />
+            </DynamicAddressAutofill>
+          ) : (
             <input
-              name="address-1 lg:w-full"
+              name="address"
               autoComplete="address-line1"
-              className="text-secondary outline-none truncate font-PlusJakartaSans font-normal opacity-100 border-b border-gray-200 pb-2"
+              className="w-full text-secondary outline-none truncate font-PlusJakartaSans font-normal opacity-100 border-b border-gray-200 pb-2"
               placeholder="Insert address, neighbourhood, city, or ZIP code"
               value={selectedLocation}
-              onChange={(e) => {
-                setSelectedLocation(e.target.value);
-                // debouncedFetchSuggestions(e.target.value);
-              }}
+              readOnly
             />
-          </AddressAutofill>
+          )}
           {/* TODO when API is available */}
           {/* {suggestions.length > 0 && (
             <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-b-lg mt-1 z-50">
