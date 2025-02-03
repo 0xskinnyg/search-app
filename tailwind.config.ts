@@ -18,12 +18,14 @@ export default {
     fontFamily: {
       PlusJakartaSans: ["PlusJakartaSans", "sans-serif"],
       VCHenrietta: ["VCHenrietta", "sans-serif"],
+      abel: ['Abel', 'sans-serif'],
+      abeeZee: ['ABeeZee', 'sans-serif'],
     },
     extend: {
       colors: {
         primary: "#A540F3",
         secondary: "#787878",
-        primaryLight: "rgba(165, 64, 243, 0.5)",
+        primaryLight: "rgba(165, 64, 243, 0.25)",
         background: "var(--background)",
         foreground: "var(--foreground)",
       },

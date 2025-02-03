@@ -1,13 +1,25 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans, Abel, ABeeZee } from "next/font/google";
 import "./globals.css";
 import { PopoverProvider } from "./context/PopoverContext";
-import { GeoProvider } from "./context/GeoContext";
 import FilterContextProvider from "./context/FilterContext";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
   subsets: ["latin"],
+  style: ["normal"],
+});
+
+const abel = Abel({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal"],
+});
+
+const abeeZee = ABeeZee({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["italic"],
 });
 
 export const metadata: Metadata = {
@@ -21,13 +33,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${plusJakartaSans.variable} antialiased`}>
-        <GeoProvider>
-          <FilterContextProvider>
-            <PopoverProvider>{children}</PopoverProvider>
-          </FilterContextProvider>
-        </GeoProvider>
+    <html
+      lang="en"
+      className={`${plusJakartaSans.variable} antialiased`}
+    >
+      <body>
+        <FilterContextProvider>
+          <PopoverProvider>{children}</PopoverProvider>
+        </FilterContextProvider>
       </body>
     </html>
   );

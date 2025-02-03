@@ -4,53 +4,30 @@ import SearchBarItem from "./SearchBarItem";
 import Image from "next/image";
 import categories from "../categories.json";
 
-import { Slider } from "@mui/material";
 import Popover from "./Popover";
 import { PopoverType, usePopover } from "../context/PopoverContext";
 import LocationPopoverContent from "./LocationPopoverContent";
 import { useFilter } from "../context/FilterContext";
-import { twMerge } from "tailwind-merge";
-import { styled } from "@mui/material/styles";
 
-const CustomSlider = styled(Slider)({
-  color: "#A540F3",
-  "& .MuiSlider-thumb": {
-    "&:hover, &.Mui-focusVisible": {
-      boxShadow: `0px 0px 0px 8px rgba(165, 64, 243, 0.16)`,
-    },
-    "&.Mui-active": {
-      boxShadow: `0px 0px 0px 14px rgba(165, 64, 243, 0.16)`,
-    },
-  },
-  "& .MuiSlider-rail": {
-    opacity: 0.32,
-  },
-  "& .MuiSlider-track": {
-    border: "none",
-  },
-  "& .MuiSlider-valueLabel": {
-    backgroundColor: "#A540F3",
-  },
-});
+import CategoriesPopoverContent from "./CategoriesPopoverContent";
+import PricePopoverContent from "./PricePopoverContent";
 
 const SearchBar = () => {
-  const [priceRange, setPriceRange] = useState([0, 1000000]);
-
   const { activePopover, setActivePopover } = usePopover();
-  const { withinId, type, setType, rentType, rent, setRent, setSearchResults } =
-    useFilter();
+  const {
+    withinId,
+    type,
+    setType,
+    rentType,
+    rent,
+    setRent,
+    setSearchResults,
+    menuItems,
+  } = useFilter();
 
   const selectedCategories = useMemo(() => {
     return categories.filter((category) => type.includes(category.id));
   }, [type]);
-
-  const handlePriceRangeChange = (
-    event: Event,
-    newValue: number | number[]
-  ) => {
-    setPriceRange(newValue as number[]);
-    setRent(newValue as number[]);
-  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -80,10 +57,36 @@ const SearchBar = () => {
     }
   };
   console.log(activePopover);
+  console.log(rent, "rent");
+
+  // Get selected districts names
+  const selectedDistrictsText = useMemo(() => {
+    if (!withinId.length) return "";
+
+    const selectedDistricts = menuItems
+      .filter((item) => withinId.includes(item.id))
+      .map((item) => item.name);
+
+    return selectedDistricts.join(", ");
+  }, [withinId, menuItems]);
+
+  // Update input placeholder/value based on selection
+  const inputText = useMemo(() => {
+    if (selectedDistrictsText) {
+      return selectedDistrictsText;
+    }
+  }, [selectedDistrictsText]);
+
+  const inputPlaceholder = useMemo(() => {
+    if (selectedDistrictsText) {
+      return selectedDistrictsText;
+    }
+    return "Search address, neighbourhood, city, or ZIP code";
+  }, [selectedDistrictsText]);
   return (
     <div className="bg-white md:rounded-full border md:border-primary border-1 border-solid px-4 sm:px-8 py-3 sm:py-4 md:py-5 w-full max-w-[1624px]">
       <form
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-8 xl:gap-40"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 md:gap-8 xl:gap-40"
         onSubmit={handleSubmit}
       >
         <SearchBarItem
@@ -100,14 +103,16 @@ const SearchBar = () => {
         >
           <div className="relative max-w-full sm:max-w-96">
             <p
-              className="text-secondary cursor-pointer truncate max-w-40 md:max-w-96 text-sm sm:text-base popover-trigger"
+              className="text-secondary cursor-pointer truncate max-w-40 md:max-w-60 lg:max-w-96 text-sm sm:text-base popover-trigger"
               onClick={() => {
                 setActivePopover((prevState: PopoverType) =>
                   prevState !== "location" ? ("location" as PopoverType) : null
                 );
               }}
             >
-              Search address, neighbourhood, city, or ZIP code
+              {inputText
+                ? inputText
+                : "Search address, neighbourhood, city, or ZIP code"}
             </p>
             {activePopover === "location" && (
               <Popover>
@@ -146,32 +151,11 @@ const SearchBar = () => {
             </p>
             {activePopover === "category" && (
               <Popover>
-                <div className="flex flex-col gap-2  min-w-48 xs:min-w-60 max-h-80 overflow-y-scroll">
-                  {categories.map((category) => (
-                    <div
-                      key={category.id}
-                      className={twMerge(
-                        "flex items-center gap-2 px-4 py-3 cursor-pointer",
-                        type.includes(category.id) && "bg-primaryLight"
-                      )}
-                      onClick={() => {
-                        if (type.includes(category.id)) {
-                          setType(type.filter((id) => id !== category.id));
-                        } else {
-                          setType([...type, category.id]);
-                        }
-                      }}
-                    >
-                      <Image
-                        src={category.icon}
-                        alt={category.name}
-                        width={22}
-                        height={22}
-                      />
-                      <p>{category.name}</p>
-                    </div>
-                  ))}
-                </div>
+                <CategoriesPopoverContent
+                  categories={categories}
+                  type={type}
+                  setType={setType}
+                />
               </Popover>
             )}
           </div>
@@ -198,32 +182,13 @@ const SearchBar = () => {
                 )
               }
             >
-              {priceRange[0] === 0 && priceRange[1] === 1000000
+              {rent[0] === 100 && rent[1] === 10000
                 ? "Select Price"
-                : `$${priceRange[0]} - $${priceRange[1]}`}
+                : `€${rent[0]} - €${rent[1]}`}
             </p>
             {activePopover === "price" && (
               <Popover>
-                <div className="flex flex-col items-start gap-4 p-4 w-full min-w-48 xs:min-w-60">
-                  <p className="font-semibold">Price Range</p>
-                  <div className="flex gap-2 items-baseline">
-                    {new Array(20).fill(0).map((_, index) => (
-                      <div
-                        key={index}
-                        className="bg-primary w-1"
-                        style={{ height: `${index * 2 + 5}px` }}
-                      />
-                    ))}
-                  </div>
-                  <CustomSlider
-                    aria-label="Price Range"
-                    value={priceRange}
-                    onChange={handlePriceRangeChange}
-                    valueLabelDisplay="auto"
-                    min={0}
-                    max={1000000}
-                  />
-                </div>
+                <PricePopoverContent rent={rent} setRent={setRent} />
               </Popover>
             )}
           </div>

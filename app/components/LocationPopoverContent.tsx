@@ -1,19 +1,20 @@
+"use client";
 import { AddressAutofill } from "@mapbox/search-js-react";
-import { useEffect, useState } from "react";
-import { useGeo } from "../context/GeoContext";
+import { useEffect, useRef, useState, useMemo } from "react";
 import Image from "next/image";
 import { useFilter } from "../context/FilterContext";
 import { twMerge } from "tailwind-merge";
+import { v4 as uuidv4 } from "uuid";
+import debounce from "lodash/debounce";
 
 const LocationPopoverContent = () => {
   const [selectedCity, setSelectedCity] = useState("Vienna");
   const [selectedLocation, setSelectedLocation] = useState("");
-  const [menuItems, setMenuItems] = useState<
-    { name: string; id: string; postal_code: string }[]
-  >([]);
-  const { withinId, setWithinId } = useFilter();
+  const [suggestions, setSuggestions] = useState([]);
+  const { withinId, setWithinId, popularLocations, menuItems, setMenuItems } =
+    useFilter();
 
-  const { popularLocations } = useGeo();
+  const sessionToken = uuidv4();
 
   useEffect(() => {
     if (popularLocations !== undefined && popularLocations.length) {
@@ -24,27 +25,88 @@ const LocationPopoverContent = () => {
     }
   }, [popularLocations, selectedCity]);
 
+  const debouncedFetchSuggestions = useRef(
+    debounce(async (query: string) => {
+      if (query.length < 3) {
+        setSuggestions([]);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/mapbox/search/suggest?q=${encodeURIComponent(query)}` // Not working ATM (403 Forbidden)
+        );
+
+        if (!response.ok) {
+          console.log(response);
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        setSuggestions(data.suggestions || []);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      }
+    }, 300)
+  ).current;
+
+  const handleLocationSelect = async (suggestionId: string) => {
+    try {
+      const response = await fetch("/api/mapbox/search/retrieve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          suggestion_id: suggestionId,
+          session_token: sessionToken,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Network response was not ok");
+      const data = await response.json();
+      setSelectedLocation(data.feature.properties.name);
+      setSuggestions([]); // Clear suggestions after selection
+    } catch (error) {
+      console.error("Error retrieving location:", error);
+    }
+  };
+
   console.log(menuItems);
   return (
-    <div className="flex flex-row gap-4 lg:min-w-96 max-h-80 overflow-y-scroll">
-      <div className="flex flex-col gap-4">
-        <AddressAutofill
-          accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ""}
-          options={{
-            language: "de",
-            country: "at",
-          }}
-        >
-          <input
-            name="address-1 lg:w-full"
-            autoComplete="address-line1"
-            className="text-secondary outline-none"
-            placeholder="Search address, neighbourhood, city, or ZIP code"
-            value={selectedLocation}
-            onChange={(e) => setSelectedLocation(e.target.value)}
-          />
-        </AddressAutofill>
-        <p className="flex items-center gap-2 font-medium">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 xl:w-[600px]">
+      <div className="flex flex-col gap-6 flex-1">
+        <div className="relative max-h-4">
+          <AddressAutofill
+            accessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || ""}
+          >
+            <input
+              name="address-1 lg:w-full"
+              autoComplete="address-line1"
+              className="text-secondary outline-none truncate font-PlusJakartaSans font-normal opacity-100 border-b border-gray-200 pb-2"
+              placeholder="Insert address, neighbourhood, city, or ZIP code"
+              value={selectedLocation}
+              onChange={(e) => {
+                setSelectedLocation(e.target.value);
+                debouncedFetchSuggestions(e.target.value);
+              }}
+            />
+          </AddressAutofill>
+
+          {suggestions.length > 0 && (
+            <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-b-lg mt-1 z-50">
+              {suggestions.map((suggestion: any) => (
+                <div
+                  key={suggestion.mapbox_id}
+                  className="p-2 hover:bg-gray-100 cursor-pointer"
+                  onClick={() => handleLocationSelect(suggestion.mapbox_id)}
+                >
+                  {suggestion.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        <p className="flex items-center gap-4 font-medium cursor-pointer">
           <Image
             src="/images/mdi_my-location.png"
             width={22}
@@ -54,7 +116,7 @@ const LocationPopoverContent = () => {
           Current Location
         </p>
         <div>
-          <p className="text-secondary text-sm mb-2">Popular Locations</p>
+          <p className="text-secondary text-sm mb-4">Popular Locations</p>
           <div className="flex flex-col gap-2">
             {popularLocations.map((location) => (
               <div
@@ -64,9 +126,10 @@ const LocationPopoverContent = () => {
                   setSelectedCity(location.name);
                 }}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
                   {location.name === "Vienna" && (
                     <Image
+                      className="rounded-xs"
                       alt="Vienna"
                       src="/images/vienna.png"
                       height={47}
@@ -75,13 +138,16 @@ const LocationPopoverContent = () => {
                   )}
                   {location.name === "Linz" && (
                     <Image
+                      className="rounded-xs"
                       alt="Linz"
                       src="/images/linz.png"
                       height={47}
                       width={47}
                     />
                   )}
-                  <p className="font-medium text-nowrap">{location.name}</p>
+                  <p className="font-medium text-base text-nowrap">
+                    {location.name}
+                  </p>
                 </div>
                 {selectedCity === location.name ? (
                   <div>
@@ -100,20 +166,59 @@ const LocationPopoverContent = () => {
         <div>
           <p className="text-secondary text-sm mb-2">Recent Searches</p>
           <div className="flex flex-col gap-2">
-            <p>Vienna, Austria</p>
-            <p>Vienna, Austria</p>
-            <p>Vienna, Austria</p>
+            <div className="flex items-center gap-4 cursor-pointer p-2">
+              <div>
+                <Image
+                  alt="Location marker"
+                  src="/images/typcn_location.png"
+                  width={24}
+                  height={24}
+                />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-base font-medium text-nowrap">Vienna</p>
+                <p className="text-secondary text-sm">Austria</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 cursor-pointer p-2">
+              <div>
+                <Image
+                  alt="Location marker"
+                  src="/images/typcn_location.png"
+                  width={24}
+                  height={24}
+                />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-base font-medium text-nowrap">Vienna</p>
+                <p className="text-secondary text-sm">Austria</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 cursor-pointer p-2">
+              <div>
+                <Image
+                  alt="Location marker"
+                  src="/images/typcn_location.png"
+                  width={24}
+                  height={24}
+                />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-base font-medium text-nowrap">Vienna</p>
+                <p className="text-secondary text-sm">Austria</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div>
+      <div className="flex flex-col gap-4">
         <p className="text-secondary text-sm mb-2">
           Districts in {selectedCity}
         </p>
         <div className="flex flex-col gap-4">
           <div
             key="alldistricts"
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-4 cursor-pointer"
           >
             <div>
               <Image
@@ -141,35 +246,37 @@ const LocationPopoverContent = () => {
             </div>
           </div>
         </div>
-        {menuItems.map((item) => (
-          <div
-            key={item.id}
-            className={twMerge(
-              "flex items-center gap-2 cursor-pointer p-2",
-              withinId.includes(item.id) && "bg-primaryLight"
-            )}
-            onClick={() => {
-              if (withinId.includes(item.id)) {
-                setWithinId(withinId.filter((id) => id !== item.id));
-              } else {
-                setWithinId([...withinId, item.id]);
-              }
-            }}
-          >
-            <div>
-              <Image
-                alt="Location marker"
-                src="/images/typcn_location.png"
-                width={24}
-                height={24}
-              />
+        <div className="flex flex-col">
+          {menuItems.map((item) => (
+            <div
+              key={item.id}
+              className={twMerge(
+                "flex items-center gap-4 cursor-pointer py-4",
+                withinId.includes(item.id) && "bg-primaryLight"
+              )}
+              onClick={() => {
+                if (withinId.includes(item.id)) {
+                  setWithinId(withinId.filter((id) => id !== item.id));
+                } else {
+                  setWithinId([...withinId, item.id]);
+                }
+              }}
+            >
+              <div>
+                <Image
+                  alt="Location marker"
+                  src="/images/typcn_location.png"
+                  width={24}
+                  height={24}
+                />
+              </div>
+              <div className="flex flex-col">
+                <p className="text-base font-medium text-nowrap">{item.name}</p>
+                <p className="text-secondary text-sm">{item.postal_code}</p>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <p className="text-base font-medium text-nowrap">{item.name}</p>
-              <p className="text-secondary text-sm">{item.postal_code}</p>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

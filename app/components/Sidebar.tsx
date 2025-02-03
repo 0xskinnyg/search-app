@@ -38,7 +38,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) => {
           <button className="py-3 px-8 border border-[#4F4040] rounded-full">
             Log In
           </button>
-          <button className="py-3 px-8 border border-[#4F4040] rounded-full bg-primary text-white">
+          <button className="py-3 px-8 rounded-full bg-primary text-white">
             Register
           </button>
         </div>
