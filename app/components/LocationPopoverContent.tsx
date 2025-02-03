@@ -1,6 +1,6 @@
 "use client";
 import { AddressAutofill } from "@mapbox/search-js-react";
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useFilter } from "../context/FilterContext";
 import { twMerge } from "tailwind-merge";
@@ -23,7 +23,7 @@ const LocationPopoverContent = () => {
       );
       if (foundCity) setMenuItems(foundCity.children);
     }
-  }, [popularLocations, selectedCity]);
+  }, [popularLocations, selectedCity, setMenuItems]);
 
   const debouncedFetchSuggestions = useRef(
     debounce(async (query: string) => {
@@ -91,8 +91,8 @@ const LocationPopoverContent = () => {
               }}
             />
           </AddressAutofill>
-
-          {suggestions.length > 0 && (
+          {/* TODO when API is available */}
+          {/* {suggestions.length > 0 && (
             <div className="absolute top-full left-0 w-full bg-white shadow-lg rounded-b-lg mt-1 z-50">
               {suggestions.map((suggestion: any) => (
                 <div
@@ -104,7 +104,7 @@ const LocationPopoverContent = () => {
                 </div>
               ))}
             </div>
-          )}
+          )} */}
         </div>
         <p className="flex items-center gap-4 font-medium cursor-pointer">
           <Image

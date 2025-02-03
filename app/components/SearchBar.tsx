@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import SearchBarItem from "./SearchBarItem";
 import Image from "next/image";
 import categories from "../categories.json";
@@ -56,8 +56,6 @@ const SearchBar = () => {
       console.error("Error fetching search results:", error);
     }
   };
-  console.log(activePopover);
-  console.log(rent, "rent");
 
   // Get selected districts names
   const selectedDistrictsText = useMemo(() => {
@@ -77,12 +75,6 @@ const SearchBar = () => {
     }
   }, [selectedDistrictsText]);
 
-  const inputPlaceholder = useMemo(() => {
-    if (selectedDistrictsText) {
-      return selectedDistrictsText;
-    }
-    return "Search address, neighbourhood, city, or ZIP code";
-  }, [selectedDistrictsText]);
   return (
     <div className="bg-white md:rounded-full border md:border-primary border-1 border-solid px-4 sm:px-8 py-3 sm:py-4 md:py-5 w-full max-w-[1624px]">
       <form

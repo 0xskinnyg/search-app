@@ -19,7 +19,7 @@ const abel = Abel({
 const abeeZee = ABeeZee({
   subsets: ["latin"],
   weight: "400",
-  style: ["italic"],
+  style: ["italic", "normal"],
 });
 
 export const metadata: Metadata = {
@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plusJakartaSans.variable} antialiased`}
+      className={`${plusJakartaSans.variable} ${abel.className} ${abeeZee.className} antialiased`}
     >
       <body>
         <FilterContextProvider>

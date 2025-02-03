@@ -9,7 +9,7 @@ const Popover = ({
   children: React.ReactNode;
   excludeClass?: string;
 }) => {
-  const { activePopover, setActivePopover } = usePopover();
+  const { setActivePopover } = usePopover();
   const popoverRef = useRef<HTMLDivElement>(null);
   const [isClosing, setIsClosing] = useState(false);
 

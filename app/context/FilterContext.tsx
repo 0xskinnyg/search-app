@@ -98,7 +98,6 @@ const FilterContextProvider = ({ children }: { children: React.ReactNode }) => {
 
       const data = await response.json();
       // if data is empty, mock price histogram
-      console.log(data, "data");
       if (
         data.length === 0 ||
         data.histogram?.every((value: number) => value === 0)
@@ -122,7 +121,7 @@ const FilterContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   // both always empty
-  console.log(priceHistogram);
+  console.log(priceHistogram, "price histogram");
   console.log(recentSearches, "recent searches");
 
   return (
