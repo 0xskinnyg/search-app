@@ -13,10 +13,8 @@ const Popover = ({ children }: { children: React.ReactNode }) => {
 
       if (!popoverRef.current?.contains(target)) {
         setIsClosing(true);
-        setTimeout(() => {
-          setActivePopover(null);
-          setIsClosing(false);
-        }, 200);
+        setActivePopover(null);
+        setIsClosing(false);
       }
     };
 
