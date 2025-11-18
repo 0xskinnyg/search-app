@@ -34,3 +34,7 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Project Description
+
+Rent or buy from a list of available apartments, houses, commercial properties, and more using a geolocation filter that shows the total number of properties available from our API. This website is integrated with Mapbox API. Tech stack: Next, Typescript, Node, Tailwind, Material UI. Check out the live demo [here](https://search-app-sigma-ten.vercel.app).
